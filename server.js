@@ -31,7 +31,7 @@ app.use(cors());
 // });
 
 // routes middleware kind of importing all routes file son that seperately na import karna pade
-readdirSync("./routes").map((r) => app.use("/api", require("./routes/" + r)));
+readdirSync("./routes").map((r) => app.use("/api", require("./routes/" + r))); // /api/{x}/    find route/x wala in all routers
 // port
 const port = process.env.PORT || 8000;
 

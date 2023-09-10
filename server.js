@@ -4,7 +4,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config();
-
+const { readdirSync } = require("fs");
 // app
 const app = express();
 
@@ -24,12 +24,14 @@ app.use(bodyParser.json({ limit: "2mb" }));
 app.use(cors());
 
 // route
-app.get("/api", (req, res) => {
-  res.json({
-    data: "hey you hit node API",
-  });
-});
+// app.get("/api", (req, res) => {
+//   res.json({
+//     data: "hey you hit node API",
+//   });
+// });
 
+// routes middleware kind of importing all routes file son that seperately na import karna pade
+readdirSync("./routes").map((r) => app.use("/api", require("./routes/" + r)));
 // port
 const port = process.env.PORT || 8000;
 

@@ -13,17 +13,20 @@ exports.create = async (req, res) => {
 };
 
 exports.list = async (req, res) => {
-  const categlist = Category.find({}).sort({ createdAt: -1 }).exec(); // find list of categories from databse category model
+  console.log("yoyo11");
+  const categlist = await Category.find({}).sort({ createdAt: -1 }).exec(); // find list of categories from databse category model
+  console.log(categlist);
   res.json(categlist); //sending back this categ  list in response after that
 };
 
 exports.read = async (req, res) => {
   let category = await Category.findOne({ slug: req.params.slug }).exec(); // given param me categ ka naam aya hoga in slug param  /:slug, finding that categ from databse
-  res.json(category); //sending back in response
+  res.json(await Category.findOne({ slug: req.params.slug }).exec()); //sending back in response
 };
 
 exports.update = async (req, res) => {
   const { name } = req.body;
+
   try {
     const updated = await Category.findOneAndUpdate(
       { slug: req.params.slug }, //slug= req.params.slug  (old categ name)

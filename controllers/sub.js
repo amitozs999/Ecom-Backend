@@ -4,7 +4,9 @@ const slugify = require("slugify");
 exports.create = async (req, res) => {
   try {
     const { name, parent } = req.body;
-    const newsub = new Sub({ name, parent, slug: slugify(name) }).save();
+    const newsub = await new Sub({ name, parent, slug: slugify(name) }).save();
+
+    console.log(newsub + "pp");
     res.json(newsub);
   } catch (err) {
     console.log("SUB CREATE ERR ----->", err);
@@ -14,6 +16,8 @@ exports.create = async (req, res) => {
 
 exports.list = async (req, res) => {
   const subcateglist = await Sub.find({}).sort({ createdAt: -1 }).exec();
+
+  console.log(subcateglist);
   res.json(subcateglist);
 };
 

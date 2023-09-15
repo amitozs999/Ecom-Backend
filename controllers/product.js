@@ -3,7 +3,8 @@ const slugify = require("slugify");
 
 exports.create = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log(req.body + "llll");
+    console.log(req.body.title + "llllyy");
     req.body.slug = slugify(req.body.title);
     const newProduct = await new Product(req.body).save(); // json me hi bhejs hoga direct usi me add kardo product ko
     res.json(newProduct);

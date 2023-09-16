@@ -69,3 +69,52 @@ exports.update = async (req, res) => {
     });
   }
 };
+
+// WITHOUT PAGINATION
+// exports.list = async (req, res) => {
+//   try {
+//     // createdAt/updatedAt, desc/asc, 3
+//     const { sort, order, limit } = req.body;
+//     const products = await Product.find({})
+//       .populate("category")
+//       .populate("subs")
+//       .sort([[sort, order]])
+//       .limit(limit)
+//       .exec();
+
+//     res.json(products);
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
+
+// WITH PAGINATION
+exports.list = async (req, res) => {
+  // console.table(req.body);
+  try {
+    // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)
+    const { sort, order, page } = req.body;
+    const currentPage = page || 1; //by default page 1
+    const perPage = 3; // 3
+
+    const products = await Product.find({})
+      .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
+      .populate("category")
+      .populate("subs")
+      .sort([[sort, order]]) //sort by created, order is descending
+      .limit(perPage)
+      .exec();
+
+    res.json(products);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.productsCount = async (req, res) => {
+  console.log("herecnt");
+  let total = await Product.find({}).estimatedDocumentCount().exec();
+
+  console.log(total + "cnt");
+  res.json(total);
+};

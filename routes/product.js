@@ -13,6 +13,8 @@ const { list } = require("../controllers/product");
 
 const { productsCount } = require("../controllers/product");
 
+const { productStar } = require("../controllers/product");
+
 // routes
 
 router.get("/products/total", productsCount);
@@ -28,5 +30,7 @@ router.delete("/product/:slug", authCheck, adminCheck, remove);
 router.put("/product/:slug", authCheck, adminCheck, update);
 
 router.post("/products", list); //to get the list based on same conditions post bcoz pass some condition param inside body
+
+router.put("/product/star/:productId", authCheck, productStar);
 
 module.exports = router;

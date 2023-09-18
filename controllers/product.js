@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const slugify = require("slugify");
+const User = require("../models/user");
 
 exports.create = async (req, res) => {
   try {
@@ -117,4 +118,49 @@ exports.productsCount = async (req, res) => {
 
   console.log(total + "cnt");
   res.json(total);
+};
+
+exports.productStar = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec(); //find that prod
+  const user = await User.findOne({ email: req.user.email }).exec(); //find that user jisne rating bheji he
+  const { star } = req.body; //fetch star
+
+  // check if currently logged in user have already added rating to this product?
+  //return ratobj
+  let existingRatingObject = product.ratings.find(
+    (r) => r.postedBy.toString() === user._id.toString()
+  );
+
+  if (existingRatingObject === undefined) {
+    // first time rate
+
+    let ratingAdded = await Product.findByIdAndUpdate(
+      product._id,
+      {
+        $push: { ratings: { star, postedBy: user._id } }, //
+      },
+      { new: true } // If you want it to return the modified document
+
+      //$push{  } in this prod
+      // ratings: [
+      //   {
+      //     star: Number,
+      //     postedBy: { type: ObjectId, ref: "User" },
+      //   },
+      // ],
+    ).exec();
+    console.log("ratingAdded", ratingAdded);
+    res.json(ratingAdded);
+  } else {
+    // if user have already left rating, update it
+    const ratingUpdated = await Product.updateOne(
+      {
+        ratings: { $elemMatch: existingRatingObject }, //jiiska ratobj vo tha jo uper mila already ratdwala
+      },
+      { $set: { "ratings.$.star": star } }, //uska star update with new star
+      { new: true }
+    ).exec();
+    console.log("ratingUpdated", ratingUpdated);
+    res.json(ratingUpdated);
+  }
 };

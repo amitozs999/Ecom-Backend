@@ -164,3 +164,19 @@ exports.productStar = async (req, res) => {
     res.json(ratingUpdated);
   }
 };
+
+exports.listRelated = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec(); //find jonsa curr prod he
+
+  const related = await Product.find({
+    _id: { $ne: product._id }, //not equal to this one baki consider all
+    category: product.category, // same to this prod categ
+  })
+    .limit(3)
+    .populate("category")
+    .populate("subs")
+    .populate("postedBy")
+    .exec();
+
+  res.json(related);
+};

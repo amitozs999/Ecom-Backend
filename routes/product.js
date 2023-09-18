@@ -15,6 +15,8 @@ const { productsCount } = require("../controllers/product");
 
 const { productStar } = require("../controllers/product");
 
+const { listRelated } = require("../controllers/product");
+
 // routes
 
 router.get("/products/total", productsCount);
@@ -32,5 +34,8 @@ router.put("/product/:slug", authCheck, adminCheck, update);
 router.post("/products", list); //to get the list based on same conditions post bcoz pass some condition param inside body
 
 router.put("/product/star/:productId", authCheck, productStar);
+
+// related
+router.get("/product/related/:productId", listRelated);
 
 module.exports = router;

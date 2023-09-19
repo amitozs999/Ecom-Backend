@@ -180,3 +180,188 @@ exports.listRelated = async (req, res) => {
 
   res.json(related);
 };
+
+//search/filters based on
+//     query,
+//     price,
+//     category,
+//     stars,
+//     sub,
+//     shipping,
+//     color,
+//     brand,
+
+const handleQuery = async (req, res, query) => {
+  const products = await Product.find({
+    //$text: { $search: query }
+    slug: {
+      $regex: `(.*)${query}(.*)`,
+    },
+  }) //search passed query in product text
+    .populate("category", "_id name")
+    .populate("subs", "_id name")
+    .populate("postedBy", "_id name")
+    .exec();
+
+  res.json(products);
+};
+
+const handlePrice = async (req, res, price) => {
+  try {
+    let products = await Product.find({
+      price: {
+        $gte: price[0], // greater then
+        $lte: price[1], //lesss than
+      },
+    })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .populate("postedBy", "_id name")
+      .exec();
+
+    res.json(products);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const handleCategory = async (req, res, category) => {
+  try {
+    let products = await Product.find({ category }) //same ctaeg wale
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .populate("postedBy", "_id name")
+      .exec();
+
+    res.json(products);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const handleStar = (req, res, stars) => {
+  Product.aggregate([
+    {
+      //rating structure was diff so diff method for filter
+      // ratings: [
+      //   {
+      //     star: Number,
+      //     postedBy: { type: ObjectId, ref: "User" },
+      //   },
+      // ],
+
+      //now each prod can have array of rating[1,4,5,5,2] need to take average for each prod and store in new doc
+
+      $project: {
+        //created new doc for rating
+        document: "$$ROOT",
+
+        floorAverage: {
+          $floor: { $avg: "$ratings.star" }, //    //taking avg of rating arr for each prod
+        },
+      },
+    },
+    { $match: { floorAverage: stars } }, //now consider those prod which has avg rating as jo rating/star passed he in filter api
+  ])
+    .limit(12)
+    .exec((err, aggregates) => {
+      if (err) console.log("AGGREGATE ERROR", err);
+
+      Product.find({ _id: aggregates }) //aggreagtes
+        .populate("category", "_id name")
+        .populate("subs", "_id name")
+        .populate("postedBy", "_id name")
+        .exec((err, products) => {
+          if (err) console.log("PRODUCT AGGREGATE ERROR", err);
+          res.json(products);
+        });
+    });
+};
+
+const handleSub = async (req, res, sub) => {
+  const products = await Product.find({ subs: sub })
+    .populate("category", "_id name")
+    .populate("subs", "_id name")
+    .populate("postedBy", "_id name")
+    .exec();
+
+  res.json(products);
+};
+
+const handleShipping = async (req, res, shipping) => {
+  const products = await Product.find({ shipping })
+    .populate("category", "_id name")
+    .populate("subs", "_id name")
+    .populate("postedBy", "_id name")
+    .exec();
+
+  res.json(products);
+};
+
+const handleColor = async (req, res, color) => {
+  const products = await Product.find({ color })
+    .populate("category", "_id name")
+    .populate("subs", "_id name")
+    .populate("postedBy", "_id name")
+    .exec();
+
+  res.json(products);
+};
+
+const handleBrand = async (req, res, brand) => {
+  const products = await Product.find({ brand })
+    .populate("category", "_id name")
+    .populate("subs", "_id name")
+    .populate("postedBy", "_id name")
+    .exec();
+
+  res.json(products);
+};
+
+exports.searchFilters = async (req, res) => {
+  const { query, price, category, stars, sub, shipping, color, brand } =
+    req.body; //check karlenge req ki body me kya bheja us hisab se function call
+
+  //using different function for each different filter search based
+
+  if (query) {
+    console.log("query --->", query);
+    await handleQuery(req, res, query);
+  }
+
+  // price [20, 200]
+  if (price !== undefined) {
+    console.log("price ---> ", price);
+    await handlePrice(req, res, price);
+  }
+
+  if (category) {
+    console.log("category ---> ", category);
+    await handleCategory(req, res, category);
+  }
+
+  if (stars) {
+    console.log("stars ---> ", stars);
+    await handleStar(req, res, stars);
+  }
+
+  if (sub) {
+    console.log("sub ---> ", sub);
+    await handleSub(req, res, sub);
+  }
+
+  if (shipping) {
+    console.log("shipping ---> ", shipping);
+    await handleShipping(req, res, shipping);
+  }
+
+  if (color) {
+    console.log("color ---> ", color);
+    await handleColor(req, res, color);
+  }
+
+  if (brand) {
+    console.log("brand ---> ", brand);
+    await handleBrand(req, res, brand);
+  }
+};

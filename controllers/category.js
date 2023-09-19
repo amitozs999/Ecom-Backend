@@ -1,6 +1,6 @@
 const Category = require("../models/category");
 const Sub = require("../models/sub");
-
+const Product = require("../models/product");
 const slugify = require("slugify");
 
 exports.create = async (req, res) => {
@@ -21,9 +21,20 @@ exports.list = async (req, res) => {
   res.json(categlist); //sending back this categ  list in response after that
 };
 
+// exports.read = async (req, res) => {
+//   let category = await Category.findOne({ slug: req.params.slug }).exec(); // given param me categ ka naam aya hoga in slug param  /:slug, finding that categ from databse
+//   res.json(await Category.findOne({ slug: req.params.slug }).exec()); //sending back in response
+// };
+
 exports.read = async (req, res) => {
-  let category = await Category.findOne({ slug: req.params.slug }).exec(); // given param me categ ka naam aya hoga in slug param  /:slug, finding that categ from databse
-  res.json(await Category.findOne({ slug: req.params.slug }).exec()); //sending back in response
+  let category = await Category.findOne({ slug: req.params.slug }).exec();
+  // res.json(category);
+  const products = await Product.find({ category }).populate("category").exec();
+
+  res.json({
+    category,
+    products,
+  });
 };
 
 exports.update = async (req, res) => {

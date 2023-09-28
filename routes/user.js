@@ -10,11 +10,15 @@ const {
   getUserCart,
   emptyCart,
   saveAddress,
+  applyCouponToUserCart,
 } = require("../controllers/user");
 
 router.post("/user/cart", authCheck, userCart); // save cart
 router.get("/user/cart", authCheck, getUserCart); // get cart
 router.delete("/user/cart", authCheck, emptyCart); // empty cart
+
+// user trying to apply coupon on cart
+router.post("/user/cart/coupon", authCheck, applyCouponToUserCart);
 
 router.post("/user/address", authCheck, saveAddress);
 

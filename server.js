@@ -23,12 +23,12 @@ app.use(morgan("dev"));
 app.use(bodyParser.json({ limit: "2mb" }));
 app.use(cors());
 
-// route
-// app.get("/api", (req, res) => {
-//   res.json({
-//     data: "hey you hit node API",
-//   });
-// });
+route;
+app.get("/api", (req, res) => {
+  res.json({
+    data: "hey you hit node API",
+  });
+});
 
 // routes middleware kind of importing all routes file son that seperately na import karna pade
 readdirSync("./routes").map((r) => app.use("/api", require("./routes/" + r))); // /api/{x}/    find route/x wala in all routers

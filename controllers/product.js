@@ -101,7 +101,7 @@ exports.list = async (req, res) => {
     // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)
     const { sort, order, page } = req.body;
     const currentPage = page || 1; //by default page 1
-    const perPage = 10; // 3
+    const perPage = 4; // 3
     // const x1 = sortt;
 
     console.log(sort);

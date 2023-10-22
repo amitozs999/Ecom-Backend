@@ -89,6 +89,11 @@ exports.update = async (req, res) => {
 //   }
 // };
 
+// Post.find({}).sort('test').exec(function(err, docs) { ... });
+// Post.find({}).sort([['date', -1]]).exec(function(err, docs) { ... });
+// Post.find({}).sort({test: 1}).exec(function(err, docs) { ... });
+// Post.find({}, null, {sort: {date: 1}}, function(err, docs) { ... });
+
 // WITH PAGINATION
 exports.list = async (req, res) => {
   // console.table(req.body);
@@ -96,13 +101,20 @@ exports.list = async (req, res) => {
     // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)
     const { sort, order, page } = req.body;
     const currentPage = page || 1; //by default page 1
-    const perPage = 3; // 3
+    const perPage = 10; // 3
+    // const x1 = sortt;
+
+    console.log(sort);
+    console.log(order);
+    console.log(page);
 
     const products = await Product.find({})
-      .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
+
       .populate("category")
       .populate("subs")
-      .sort([[sort, order]]) //sort by created, order is descending
+      //.sort([[sort, order]]) //sort by created, order is descending
+      .sort({ [sort]: order, _id: 1 }) //sort by created, order is descending
+      .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
       .limit(perPage)
       .exec();
 

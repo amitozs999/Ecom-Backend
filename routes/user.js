@@ -7,6 +7,7 @@ const { authCheck } = require("../middlewares/auth");
 // controllers
 const {
   userCart,
+  userCart2,
   getUserCart,
   emptyCart,
   saveAddress,
@@ -20,6 +21,8 @@ const {
 } = require("../controllers/user");
 
 router.post("/user/cart", authCheck, userCart); // save cart
+router.post("/user/cart2", authCheck, userCart2); // save cart
+
 router.get("/user/cart", authCheck, getUserCart); // get cart
 router.delete("/user/cart", authCheck, emptyCart); // empty cart
 

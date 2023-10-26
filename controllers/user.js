@@ -12,6 +12,8 @@ exports.userCart = async (req, res) => {
 
   const { cart } = req.body; //req me cart obj ayega
 
+  console.log("bcknd sent cart in", cart);
+
   let products = [];
 
   const user = await User.findOne({ email: req.user.email }).exec(); //cur user find
@@ -23,33 +25,42 @@ exports.userCart = async (req, res) => {
     console.log("removed old cart");
   }
 
-  for (let i = 0; i < cart.length; i++) {
-    //create obj based on our backend cart modal using passed cart obj from frontend
-    let object = {};
+  console.log("cc", cart);
+  // for (let i = 0; i < cart.length; i++) {
+  //   //create obj based on our backend cart modal using passed cart obj from frontend
+  //   let object = {};
 
-    object.product = cart[i]._id;
-    object.count = cart[i].count;
-    object.color = cart[i].color;
-    // get price for creating total
-    let { price } = await Product.findById(cart[i]._id).select("price").exec(); //verifing prod proce from databse
-    object.price = price;
+  //   object.product = cart[i]._id;
+  //   object.count = cart[i].count;
+  //   object.color = cart[i].color;
+  //   object.title = cart[i].title;
+  //   object.shipping = cart[i].shipping;
+  //   object.brand = cart[i].brand;
+  //   object.description = cart[i].description;
 
-    products.push(object);
-  }
+  //   //  object.images=cart[i]
+
+  //   // get price for creating total
+  //   let { price } = await Product.findById(cart[i]._id).select("price").exec(); //verifing prod proce from databse
+  //   object.price = price;
+
+  //   products.push(object);
+  // }
 
   // console.log('products', products)
 
   let cartTotal = 0;
-  for (let i = 0; i < products.length; i++) {
-    cartTotal = cartTotal + products[i].price * products[i].count;
+  for (let i = 0; i < cart.products.length; i++) {
+    cartTotal = cartTotal + cart.products[i].price * cartproducts[i].count;
   }
 
   // console.log("cartTotal", cartTotal);
 
   //create obj based on our backend cart modal using passed cart obj from frontend
 
+  let xx = cart.products;
   let newCart = await new Cart({
-    products,
+    xx,
     cartTotal,
     orderdBy: user._id,
   }).save();
@@ -58,15 +69,117 @@ exports.userCart = async (req, res) => {
   res.json({ ok: true });
 };
 
+exports.userCart2 = async (req, res) => {
+  // console.log(req.body); // {cart: []}
+
+  const { product } = req.body; //req me cart obj ayega
+  console.log("bcknd sent product in", product);
+  let xv = product._id;
+
+  //console.log("bcknd sent product in", product);
+
+  let products = [];
+
+  const user = await User.findOne({ email: req.user.email }).exec(); //cur user find
+
+  let cartExistByThisUser = await Cart.findOne({ orderdBy: user._id }).exec(); //check if any cart prestnt related to this user
+
+  let productIdd = product._id;
+  let countt = 1;
+  let colorr = product.color;
+  let pricee = product.price;
+
+  let mycart;
+  if (cartExistByThisUser) {
+    // cartExistByThisUser.remove(); //remove that
+    console.log("exist cart");
+
+    //cartExistByThisUser.products.push({ product, countt, colorr, pricee });
+    console.log("ss1", cartExistByThisUser);
+
+    // cartExistByThisUser.save(done);
+    console.log("orid id", product._id);
+    var origid = product._id;
+
+    var newtotal = cartExistByThisUser.cartTotal + pricee;
+    //cartExistByThisUser.update(cartTotal:newtotal);
+
+    const cc = await Cart.findOneAndUpdate(
+      { orderdBy: user._id },
+      { cartTotal: newtotal }
+    ).exec();
+
+    let existingcartObject = cartExistByThisUser.products.find(
+      (ele) => ele.product._id.toString() === origid.toString() //finf is use user ki rating for this prod
+    );
+
+    if (existingcartObject) {
+      countt = existingcartObject.count + 1;
+
+      console.log("exist cnt", countt);
+
+      let obj1 = {
+        product: product,
+        count: countt,
+        color: colorr,
+        price: pricee,
+      };
+
+      const produpdated = await Cart.updateOne(
+        {
+          products: { $elemMatch: existingcartObject }, //jiiska ratobj vo tha jo uper mila already ratdwala
+        },
+        { $set: { "products.$.count": countt } }, //uska star update with new star
+        { new: true }
+      ).exec();
+    } else {
+      let obj1 = {
+        product: product,
+        count: countt,
+        color: colorr,
+        price: pricee,
+      };
+
+      const cc = await Cart.findOneAndUpdate(
+        { orderdBy: user._id },
+        { $addToSet: { products: obj1 } }
+      ).exec();
+    }
+
+    console.log("ss2", cartExistByThisUser);
+  } else {
+    console.log("not exist cart");
+    let obj1 = {
+      product: product,
+      count: countt,
+      color: colorr,
+      price: pricee,
+    };
+    const newCart = await Cart.create({
+      products: [obj1],
+      cartTotal: 6772,
+      orderdBy: user._id,
+    });
+    console.log("ss", newCart);
+  }
+
+  // console.log("new cart ----> ", newCart);
+  res.json({ ok: true });
+};
+
 exports.getUserCart = async (req, res) => {
   const user = await User.findOne({ email: req.user.email }).exec();
 
   let cart = await Cart.findOne({ orderdBy: user._id }) //find cart for this user
-    .populate("products.product", "_id title price totalAfterDiscount")
+    .populate(
+      "products.product",
+      "_id title price totalAfterDiscount quantity images"
+    )
     .exec();
 
-  const { products, cartTotal, totalAfterDiscount } = cart; //fetch these values
-  res.json({ products, cartTotal, totalAfterDiscount }); //s end back in response
+  //const { products, cartTotal, totalAfterDiscount } = cart; //fetch these values
+  // res.json({ products, cartTotal, totalAfterDiscount }); //s end back in response
+  res.json(cart);
 };
 
 exports.emptyCart = async (req, res) => {

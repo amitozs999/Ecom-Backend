@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    tempcart: {
+      type: Array,
+      default: [],
+    },
     address: String,
     wishlist: [{ type: ObjectId, ref: "Product" }],
   },

@@ -89,6 +89,8 @@ exports.userCart2 = async (req, res) => {
   let colorr = product.color;
   let pricee = product.price;
 
+  let titlee = product.title;
+
   let mycart;
   if (cartExistByThisUser) {
     // cartExistByThisUser.remove(); //remove that
@@ -123,6 +125,7 @@ exports.userCart2 = async (req, res) => {
         count: countt,
         color: colorr,
         price: pricee,
+        title: titlee,
       };
 
       const produpdated = await Cart.updateOne(
@@ -138,6 +141,7 @@ exports.userCart2 = async (req, res) => {
         count: countt,
         color: colorr,
         price: pricee,
+        title: titlee,
       };
 
       const cc = await Cart.findOneAndUpdate(
@@ -154,6 +158,7 @@ exports.userCart2 = async (req, res) => {
       count: countt,
       color: colorr,
       price: pricee,
+      title: titlee,
     };
     const newCart = await Cart.create({
       products: [obj1],
@@ -173,7 +178,7 @@ exports.getUserCart = async (req, res) => {
   let cart = await Cart.findOne({ orderdBy: user._id }) //find cart for this user
     .populate(
       "products.product",
-      "_id title price totalAfterDiscount quantity images"
+      "_id title price brand shipping totalAfterDiscount quantity images"
     )
     .exec();
 

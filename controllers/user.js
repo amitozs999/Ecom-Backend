@@ -168,8 +168,19 @@ exports.userCart2 = async (req, res) => {
     console.log("ss", newCart);
   }
 
+  let cart = await Cart.findOne({ orderdBy: user._id }) //find cart for this user
+    .populate(
+      "products.product",
+      "_id title price brand shipping totalAfterDiscount quantity images"
+    )
+    .exec();
+
+  //const { products, cartTotal, totalAfterDiscount } = cart; //fetch these values
+  // res.json({ products, cartTotal, totalAfterDiscount }); //s end back in response
+  res.json(cart);
+
   // console.log("new cart ----> ", newCart);
-  res.json({ ok: true });
+  //res.json({ ok: true });
 };
 
 exports.getUserCart = async (req, res) => {

@@ -162,7 +162,7 @@ exports.userCart2 = async (req, res) => {
     };
     const newCart = await Cart.create({
       products: [obj1],
-      cartTotal: 6772,
+      cartTotal: pricee,
       orderdBy: user._id,
     });
     console.log("ss", newCart);
@@ -181,6 +181,45 @@ exports.userCart2 = async (req, res) => {
 
   // console.log("new cart ----> ", newCart);
   //res.json({ ok: true });
+};
+
+exports.userCart3 = async (req, res) => {
+  // console.log(req.body); // {cart: []}
+
+  const { cart } = req.body; //req me cart obj ayega
+
+  console.log("bcknd sent cart3 in", cart);
+
+  var newtotal = cart.data.cartTotal;
+
+  let products = [];
+
+  const user = await User.findOne({ email: req.user.email }).exec(); //cur user find
+
+  let cartExistByThisUser = await Cart.findOne({ orderdBy: user._id }).exec(); //check if any cart prestnt related to this user
+
+  // if (cartExistByThisUser) {
+  //   cartExistByThisUser.remove(); //remove that
+  //   console.log("removed old cart");
+  // }
+
+  const cc = await Cart.findOneAndUpdate(
+    { orderdBy: user._id },
+    { products: cart.data.products, cartTotal: newtotal }
+    // { cartTotal: newtotal }
+  ).exec();
+  console.log("cc", cart);
+
+  // let newCart = await new Cart({
+  //   cart,
+  //   newtotal,
+  //   orderdBy: user._id,
+  // }).save();
+
+  //const newCart = await Cart.create(cart);
+
+  //console.log("new cart ----> ", newCart);
+  res.json({ ok: true });
 };
 
 exports.getUserCart = async (req, res) => {

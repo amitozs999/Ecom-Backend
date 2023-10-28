@@ -8,6 +8,7 @@ const { authCheck } = require("../middlewares/auth");
 const {
   userCart,
   userCart2,
+  userCart3,
   getUserCart,
   emptyCart,
   saveAddress,
@@ -22,6 +23,7 @@ const {
 
 router.post("/user/cart", authCheck, userCart); // save cart
 router.post("/user/cart2", authCheck, userCart2); // save cart
+router.post("/user/cart3", authCheck, userCart3); // save cart
 
 router.get("/user/cart", authCheck, getUserCart); // get cart
 router.delete("/user/cart", authCheck, emptyCart); // empty cart

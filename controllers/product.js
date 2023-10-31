@@ -153,6 +153,66 @@ exports.listsort = async (req, res) => {
   }
 };
 
+exports.listsortandfilter = async (req, res) => {
+  // console.log("my query ji", req.query);
+  // console.table(req.body);
+
+  const { subcateg } = req.body;
+
+  //console.table(req.body);
+  //console.log("categpassed", categ);
+  try {
+    // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)
+    const { sort, order, page } = req.body;
+    const currentPage = page || 1; //by default page 1
+    const perPage = 8; // 3
+    // const x1 = sortt;
+
+    console.log(sort);
+    console.log(order);
+    console.log(page);
+    console.log(subcateg);
+
+    const products = await Product.find({ category: subcateg }) //same ctaeg wale
+
+      .populate("category")
+      .populate("subs")
+      //.sort([[sort, order]]) //sort by created, order is descending
+      .sort({ [sort]: order, _id: 1 }) //sort by created, order is descending
+      .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
+      .limit(perPage)
+      .exec();
+
+    //console.log("mera cat wala allray", catlist);
+
+    // let products = await Product.find({ category: subcateg }) //same ctaeg wale
+    //   .populate("category", "_id name")
+    //   .populate("subs", "_id name")
+    //   .populate("postedBy", "_id name")
+    //   .exec();
+
+    // const prods = await Product.aggregate([
+    //   {
+    //     $lookup: {
+    //       from: "categories",
+    //       localField: "category",
+    //       foreignField: "_id",
+    //       as: "cats",
+    //     },
+    //   },
+    //   {
+    //     $match: { "cats.name": "Clothing" },
+    //   },
+    // ]);
+
+    //console.log("filter prods", prods);
+
+    res.json(products);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 exports.productsCount = async (req, res) => {
   console.log("herecnt");
   let total = await Product.find({}).estimatedDocumentCount().exec();
@@ -266,9 +326,13 @@ const handlePrice = async (req, res, price) => {
   }
 };
 
-const handleCategory = async (req, res, category) => {
+const handleCategory = async (req, res, category1) => {
+  console.log("my query ji", req.query);
+
+  console.log("my body ji", req.body);
+  console.log("cat wala allray", category1);
   try {
-    let products = await Product.find({ category }) //same ctaeg wale
+    let products = await Product.find({ category: category1 }) //same ctaeg wale
       .populate("category", "_id name")
       .populate("subs", "_id name")
       .populate("postedBy", "_id name")

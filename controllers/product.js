@@ -173,7 +173,15 @@ exports.listsortandfilter = async (req, res) => {
     console.log(page);
     console.log(subcateg);
 
-    const products = await Product.find({ category: subcateg }) //same ctaeg wale
+    let mylist = {};
+
+    if (subcateg.length > 0) {
+      mylist = {
+        category: subcateg,
+      };
+    }
+    console.log("meri list", mylist);
+    const products = await Product.find(mylist) //same ctaeg wale
 
       .populate("category")
       .populate("subs")

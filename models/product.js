@@ -52,7 +52,16 @@ const productSchema = new mongoose.Schema(
     },
     color: {
       type: String,
-      enum: ["Black", "Brown", "Silver", "White", "Blue"],
+      enum: [
+        "Black",
+        "Brown",
+        "Silver",
+        "White",
+        "Blue",
+        "Orange",
+        "Grey",
+        "Green",
+      ],
     },
     brand: {
       type: String,

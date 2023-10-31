@@ -163,7 +163,7 @@ exports.listsortandfilter = async (req, res) => {
   //console.log("categpassed", categ);
   try {
     // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)
-    const { sort, order, page } = req.body;
+    const { sort, order, page, color, brand, shipping } = req.body;
     const currentPage = page || 1; //by default page 1
     const perPage = 8; // 3
     // const x1 = sortt;
@@ -171,15 +171,128 @@ exports.listsortandfilter = async (req, res) => {
     console.log(sort);
     console.log(order);
     console.log(page);
+
     console.log(subcateg);
+    console.log(color);
+    console.log(brand);
+
+    console.log(shipping);
 
     let mylist = {};
 
-    if (subcateg.length > 0) {
+    let a = subcateg.length > 0; //cattrue
+    let b = color.length > 0; //colortrue
+    let c = brand.length > 0; //brandtrue
+    let d = shipping.length > 0; //shippingmarked
+
+    // mylist = {
+    //   category: subcateg,
+    //   color: color,
+    //   brand:brand,
+    //   shipping:shipping
+    // };
+
+    if (a && b && c && d) {
+      mylist = {
+        category: subcateg,
+        color: color,
+        brand: brand,
+        shipping: shipping,
+      };
+    } else if (a && b && c) {
+      mylist = {
+        category: subcateg,
+        color: color,
+        brand: brand,
+      };
+    } else if (a && b && d) {
+      mylist = {
+        category: subcateg,
+        color: color,
+
+        shipping: shipping,
+      };
+    } else if (a && c && d) {
+      mylist = {
+        category: subcateg,
+
+        brand: brand,
+        shipping: shipping,
+      };
+    } else if (b && c && d) {
+      mylist = {
+        color: color,
+        brand: brand,
+        shipping: shipping,
+      };
+    } else if (a && b) {
+      mylist = {
+        category: subcateg,
+        color: color,
+      };
+    } else if (a && c) {
+      mylist = {
+        category: subcateg,
+
+        brand: brand,
+      };
+    } else if (a && d) {
+      mylist = {
+        category: subcateg,
+
+        shipping: shipping,
+      };
+    } else if (b && c) {
+      mylist = {
+        color: color,
+        brand: brand,
+      };
+    } else if (b && d) {
+      mylist = {
+        color: color,
+
+        shipping: shipping,
+      };
+    } else if (c && d) {
+      mylist = {
+        brand: brand,
+        shipping: shipping,
+      };
+    } else if (a) {
       mylist = {
         category: subcateg,
       };
+    } else if (b) {
+      mylist = {
+        color: color,
+      };
+    } else if (c) {
+      mylist = {
+        brand: brand,
+      };
+    } else if (d) {
+      mylist = {
+        shipping: shipping,
+      };
     }
+
+    // if (subcateg.length > 0) {
+    //   if (color.length > 0) {
+    //     mylist = {
+    //       category: subcateg,
+    //       color: color,
+    //     };
+    //   } else {
+    //     mylist = {
+    //       category: subcateg,
+    //     };
+    //   }
+    // } else if (color.length > 0) {
+    //   mylist = {
+    //     color: color,
+    //   };
+    // }
+
     console.log("meri list", mylist);
     const products = await Product.find(mylist) //same ctaeg wale
 

@@ -163,7 +163,7 @@ exports.listsortandfilter = async (req, res) => {
   //console.log("categpassed", categ);
   try {
     // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)
-    const { sort, order, page, color, brand, shipping } = req.body;
+    const { sort, order, page, color, brand, shipping, starNumbers } = req.body;
     const currentPage = page || 1; //by default page 1
     const perPage = 8; // 3
     // const x1 = sortt;
@@ -177,13 +177,14 @@ exports.listsortandfilter = async (req, res) => {
     console.log(brand);
 
     console.log(shipping);
-
+    console.log(starNumbers);
     let mylist = {};
 
     let a = subcateg.length > 0; //cattrue
     let b = color.length > 0; //colortrue
     let c = brand.length > 0; //brandtrue
     let d = shipping.length > 0; //shippingmarked
+    let e = starNumbers.length > 0; //starNumberstrue
 
     // mylist = {
     //   category: subcateg,
@@ -452,6 +453,8 @@ const handleCategory = async (req, res, category1) => {
 
   console.log("my body ji", req.body);
   console.log("cat wala allray", category1);
+  console.log("cat wala allray", category1);
+  console.log("cat wala allray", category1);
   try {
     let products = await Product.find({ category: category1 }) //same ctaeg wale
       .populate("category", "_id name")
@@ -466,6 +469,49 @@ const handleCategory = async (req, res, category1) => {
 };
 
 const handleStar = (req, res, stars) => {
+  console.log("count of stars hu");
+  console.log("count of stars", stars);
+  console.log("count of stars", stars[0]);
+  console.log("count of stars", stars[1]);
+  console.log("count of stars huy");
+
+  let as1 = stars[0];
+  let as2 = stars[1];
+  let as3 = stars[2];
+  let as4 = stars[3];
+  let as5 = stars[4];
+
+  let x = stars.length;
+  //let obj = { floorAverage: as1 };
+  let obj1 = { floorAverage: !null };
+  let obj2 = { floorAverage: !null };
+  let obj3 = { floorAverage: !null };
+  let obj4 = { floorAverage: !null };
+  let obj5 = { floorAverage: !null };
+  if (x == 1) {
+    obj1 = { floorAverage: as1 };
+  } else if (x == 2) {
+    obj1 = { floorAverage: as1 };
+    obj2 = { floorAverage: as2 };
+  } else if (x == 3) {
+    obj1 = { floorAverage: as1 };
+    obj2 = { floorAverage: as2 };
+    obj3 = { floorAverage: as3 };
+  } else if (x == 4) {
+    obj1 = { floorAverage: as1 };
+    obj2 = { floorAverage: as2 };
+    obj3 = { floorAverage: as3 };
+    obj4 = { floorAverage: as4 };
+  } else if (x == 5) {
+    obj1 = { floorAverage: as1 };
+    obj2 = { floorAverage: as2 };
+    obj3 = { floorAverage: as3 };
+    obj4 = { floorAverage: as4 };
+    obj5 = { floorAverage: as5 };
+  }
+
+  //let obj = { floorAverage: as1 };
+
   Product.aggregate([
     {
       //rating structure was diff so diff method for filter
@@ -487,11 +533,32 @@ const handleStar = (req, res, stars) => {
         },
       },
     },
-    { $match: { floorAverage: stars } }, //now consider those prod which has avg rating as jo rating/star passed he in filter api
+    {
+      $match: {
+        $or: [
+          // { floorAverage: as1 },
+          // { floorAverage: as2 },
+          // { floorAverage: !null },
+          obj1,
+          obj2,
+          obj3,
+          obj4,
+          obj5,
+          // obj,
+          // {
+          //   floorAverage: as1},
+          // {floorAverage: as2},
+          //  { floorAverage: as3},
+          // },
+        ],
+      },
+    }, //now consider those prod which has avg rating as jo rating/star passed he in filter api
   ])
     .limit(12)
     .exec((err, aggregates) => {
       if (err) console.log("AGGREGATE ERROR", err);
+
+      console.log("myagreg ids", aggregates);
 
       Product.find({ _id: aggregates }) //aggreagtes
         .populate("category", "_id name")

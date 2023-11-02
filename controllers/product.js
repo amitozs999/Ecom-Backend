@@ -163,7 +163,17 @@ exports.listsortandfilter = async (req, res) => {
   //console.log("categpassed", categ);
   try {
     // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)
-    const { sort, order, page, color, brand, shipping, starNumbers } = req.body;
+    const {
+      sort,
+      order,
+      page,
+      color,
+      brand,
+      shipping,
+      starNumbers,
+      mypricechanged,
+      myprice,
+    } = req.body;
     const currentPage = page || 1; //by default page 1
     const perPage = 8; // 3
     // const x1 = sortt;
@@ -178,6 +188,32 @@ exports.listsortandfilter = async (req, res) => {
 
     console.log(shipping);
     console.log(starNumbers);
+
+    console.log(mypricechanged);
+
+    console.log(myprice);
+
+    let low = myprice[0];
+    let high = myprice[1];
+    console.log("low", low);
+    console.log("high", high);
+
+    let priceobj = { $gte: myprice[0] };
+    if (high != 0) {
+      priceobj = {
+        $gte: myprice[0], // greater then
+        $lte: myprice[1], //lesss than
+      };
+    }
+
+    // if (myprice !== undefined)
+    // let products = await Product.find({
+    //   price: {
+    //     $gte: myprice[0], // greater then
+    //     $lte: myprice[1], //lesss than
+    //   },
+    // })
+
     let mylist = {};
 
     let a = subcateg.length > 0; //cattrue
@@ -199,12 +235,14 @@ exports.listsortandfilter = async (req, res) => {
         color: color,
         brand: brand,
         shipping: shipping,
+        price: priceobj,
       };
     } else if (a && b && c) {
       mylist = {
         category: subcateg,
         color: color,
         brand: brand,
+        price: priceobj,
       };
     } else if (a && b && d) {
       mylist = {
@@ -212,6 +250,7 @@ exports.listsortandfilter = async (req, res) => {
         color: color,
 
         shipping: shipping,
+        price: priceobj,
       };
     } else if (a && c && d) {
       mylist = {
@@ -219,61 +258,73 @@ exports.listsortandfilter = async (req, res) => {
 
         brand: brand,
         shipping: shipping,
+        price: priceobj,
       };
     } else if (b && c && d) {
       mylist = {
         color: color,
         brand: brand,
         shipping: shipping,
+        price: priceobj,
       };
     } else if (a && b) {
       mylist = {
         category: subcateg,
         color: color,
+        price: priceobj,
       };
     } else if (a && c) {
       mylist = {
         category: subcateg,
 
         brand: brand,
+        price: priceobj,
       };
     } else if (a && d) {
       mylist = {
         category: subcateg,
 
         shipping: shipping,
+        price: priceobj,
       };
     } else if (b && c) {
       mylist = {
         color: color,
         brand: brand,
+        price: priceobj,
       };
     } else if (b && d) {
       mylist = {
         color: color,
 
         shipping: shipping,
+        price: priceobj,
       };
     } else if (c && d) {
       mylist = {
         brand: brand,
         shipping: shipping,
+        price: priceobj,
       };
     } else if (a) {
       mylist = {
         category: subcateg,
+        price: priceobj,
       };
     } else if (b) {
       mylist = {
         color: color,
+        price: priceobj,
       };
     } else if (c) {
       mylist = {
         brand: brand,
+        price: priceobj,
       };
     } else if (d) {
       mylist = {
         shipping: shipping,
+        price: priceobj,
       };
     }
 
@@ -431,6 +482,7 @@ const handleQuery = async (req, res, query) => {
 
 const handlePrice = async (req, res, price) => {
   try {
+    // if (price !== undefined)
     let products = await Product.find({
       price: {
         $gte: price[0], // greater then

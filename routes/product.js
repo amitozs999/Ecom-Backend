@@ -11,7 +11,11 @@ const { listAll, remove, update } = require("../controllers/product");
 
 const { list } = require("../controllers/product");
 
-const { listsort, listsortandfilter } = require("../controllers/product");
+const {
+  listsort,
+  listsortandfilter,
+  listsortandfilterfinal,
+} = require("../controllers/product");
 
 const { productsCount } = require("../controllers/product");
 
@@ -38,7 +42,8 @@ router.put("/product/:slug", authCheck, adminCheck, update);
 router.post("/products", list); //to get the list based on same conditions post bcoz pass some condition param inside body
 router.post("/productssort", listsort);
 
-router.post("/productssortandfilter", listsortandfilter);
+//router.post("/productssortandfilter", listsortandfilter);
+router.post("/productssortandfilter", listsortandfilterfinal);
 
 router.put("/product/star/:productId", authCheck, productStar);
 

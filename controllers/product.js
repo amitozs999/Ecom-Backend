@@ -464,12 +464,14 @@ exports.listRelated = async (req, res) => {
 //     shipping,
 //     color,
 //     brand,
-
+let queryy = "plus";
 const handleQuery = async (req, res, query) => {
+  console.log("myquueryyyyy", query);
   const products = await Product.find({
     //$text: { $search: query }
+
     slug: {
-      $regex: `(.*)${query}(.*)`,
+      $regex: `(.*)${queryy}(.*)`,
     },
   }) //search passed query in product text
     .populate("category", "_id name")
@@ -833,6 +835,19 @@ const handleStar = (req, res, stars) => {
     });
 };
 
+const handletotal = async (req, res, newobj) => {
+  // const products = await Product.find({ subs: sub })
+  //   .populate("category", "_id name")
+  //   .populate("subs", "_id name")
+  //   .populate("postedBy", "_id name")
+  //   .exec();
+
+  // res.json(products);
+
+  let total = await Product.find(newobj).countDocuments().exec();
+  return total;
+};
+
 exports.listsortandfilterfinal = async (req, res) => {
   try {
     const { subcateg } = req.body;
@@ -849,6 +864,7 @@ exports.listsortandfilterfinal = async (req, res) => {
       starNumbers,
       mypricechanged,
       myprice,
+      mytext,
       // starNumbers,
     } = req.body;
     const currentPage = page || 1; //by default page 1
@@ -870,6 +886,7 @@ exports.listsortandfilterfinal = async (req, res) => {
 
     console.log(myprice);
 
+    console.log(mytext);
     console.log("count of stars hu");
     console.log("count of stars", starNumbers);
     console.log("count of stars", starNumbers[0]);
@@ -882,6 +899,11 @@ exports.listsortandfilterfinal = async (req, res) => {
     console.log("high", high);
 
     let priceobj = { $gte: myprice[0] };
+
+    // slug: {
+    //   $regex: `(.*)${queryy}(.*)`,
+    // },
+
     let pricehe = false;
     if (high != 0) {
       pricehe = true;
@@ -956,6 +978,7 @@ exports.listsortandfilterfinal = async (req, res) => {
         brand: brand,
         shipping: shipping,
         price: priceobj,
+        //  slug:
         //  _id: aggregates,
       };
     } else if (a && b && c) {
@@ -1068,6 +1091,25 @@ exports.listsortandfilterfinal = async (req, res) => {
       };
     }
 
+    let mylistwithmytext = {
+      slug: {
+        $regex: `(.*)${mytext}(.*)`,
+      },
+    };
+
+    if (mytext != "") {
+      mylist = {
+        ...mylistwithmytext,
+        ...mylist,
+      };
+    }
+
+    // let textobj={
+
+    //   ,
+
+    // }
+
     // if (subcateg.length > 0) {
     //   if (color.length > 0) {
     //     mylist = {
@@ -1084,6 +1126,8 @@ exports.listsortandfilterfinal = async (req, res) => {
     //     color: color,
     //   };
     // }
+
+    let total = await Product.find(mylist).countDocuments().exec();
 
     console.log("meri list", mylist);
 
@@ -1161,6 +1205,12 @@ exports.listsortandfilterfinal = async (req, res) => {
           console.log("I am here star condition", newobj);
           console.log("I am here star condition mylist", mylist);
           // Product.find({ _id: aggregates }) //same ctaeg wale
+
+          //total = await Product.find(newobj).countDocuments().exec();
+          // total = handletotal(req, res, newobj);
+          console.log("aggre lenght", aggregates.length);
+          total = aggregates.length;
+
           Product.find(newobj) //same ctaeg wale
             // .populate("category")
             // .populate("subs")
@@ -1173,10 +1223,13 @@ exports.listsortandfilterfinal = async (req, res) => {
             .limit(perPage)
             .exec((err, products) => {
               if (err) console.log("PRODUCT AGGREGATE ERROR", err);
-              res.json(products);
+              // res.json(products);
+              console.log("totttttt", total);
+              res.json({ products, total });
             });
         } else {
           console.log("I am here non star condition", mylist);
+
           Product.find(mylist) //same ctaeg wale
             .populate("category")
             .populate("subs")
@@ -1189,7 +1242,11 @@ exports.listsortandfilterfinal = async (req, res) => {
             .limit(perPage)
             .exec((err, products) => {
               if (err) console.log("PRODUCT AGGREGATE ERROR", err);
-              res.json(products);
+
+              // let total = Product.find({}).estimatedDocumentCount().exec();
+              console.log("totttttt", total);
+
+              res.json({ products, total });
             });
         }
       });

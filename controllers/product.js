@@ -1131,7 +1131,7 @@ exports.listsortandfilterfinal = async (req, res) => {
 
     console.log("meri list", mylist);
 
-    Product.aggregate([
+    let aggregates = await Product.aggregate([
       {
         //rating structure was diff so diff method for filter
         // ratings: [
@@ -1172,84 +1172,96 @@ exports.listsortandfilterfinal = async (req, res) => {
           ],
         },
       }, //now consider those prod which has avg rating as jo rating/star passed he in filter api
-    ])
-      //  .limit(12)
-      .exec((err, aggregates) => {
-        if (err) console.log("AGGREGATE ERROR", err);
+    ]);
 
-        console.log("myagreg ids", aggregates);
+    console.log("aggregates=", aggregates);
 
-        // Product.find({ _id: aggregates }) //aggreagtes
-        // Product.find(mylist) //aggreagtes
-        //   .populate("category", "_id name")
-        //   .populate("subs", "_id name")
-        //   .populate("postedBy", "_id name")
-        //   .exec((err, products) => {
-        //     if (err) console.log("PRODUCT AGGREGATE ERROR", err);
-        //     res.json(products);
-        //   });
+    //  .limit(12)
+    // .exec((err, aggregates) => {
+    //   if (err) console.log("AGGREGATE ERROR", err);
 
-        //  Product.find({ $or: [mylist] })
-        // products = await
+    //   console.log("myagreg ids", aggregates);
 
-        if (e) {
-          let starobj = {
-            _id: aggregates,
-          };
+    // Product.find({ _id: aggregates }) //aggreagtes
+    // Product.find(mylist) //aggreagtes
+    //   .populate("category", "_id name")
+    //   .populate("subs", "_id name")
+    //   .populate("postedBy", "_id name")
+    //   .exec((err, products) => {
+    //     if (err) console.log("PRODUCT AGGREGATE ERROR", err);
+    //     res.json(products);
+    //   });
 
-          let newobj = {
-            ...starobj,
-            ...mylist,
-          };
+    //  Product.find({ $or: [mylist] })
+    // products = await
 
-          console.log("I am here star condition", newobj);
-          console.log("I am here star condition mylist", mylist);
-          // Product.find({ _id: aggregates }) //same ctaeg wale
+    if (e) {
+      let starobj = {
+        _id: aggregates,
+      };
 
-          //total = await Product.find(newobj).countDocuments().exec();
-          // total = handletotal(req, res, newobj);
-          console.log("aggre lenght", aggregates.length);
-          total = aggregates.length;
+      let newobj = {
+        ...starobj,
+        ...mylist,
+      };
 
-          Product.find(newobj) //same ctaeg wale
-            // .populate("category")
-            // .populate("subs")
-            .populate("category", "_id name")
-            .populate("subs", "_id name")
-            .populate("postedBy", "_id name")
-            //.sort([[sort, order]]) //sort by created, order is descending
-            .sort({ [sort]: order, _id: 1 }) //sort by created, order is descending
-            .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
-            .limit(perPage)
-            .exec((err, products) => {
-              if (err) console.log("PRODUCT AGGREGATE ERROR", err);
-              // res.json(products);
-              console.log("totttttt", total);
-              res.json({ products, total });
-            });
-        } else {
-          console.log("I am here non star condition", mylist);
+      console.log("I am here star condition", newobj);
+      console.log("I am here star condition mylist", mylist);
+      // Product.find({ _id: aggregates }) //same ctaeg wale
 
-          Product.find(mylist) //same ctaeg wale
-            .populate("category")
-            .populate("subs")
-            // .populate("category", "_id name")
-            // .populate("subs", "_id name")
-            // .populate("postedBy", "_id name")
-            //.sort([[sort, order]]) //sort by created, order is descending
-            .sort({ [sort]: order, _id: 1 }) //sort by created, order is descending
-            .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
-            .limit(perPage)
-            .exec((err, products) => {
-              if (err) console.log("PRODUCT AGGREGATE ERROR", err);
+      //total = await Product.find(newobj).countDocuments().exec();
+      // total = handletotal(req, res, newobj);
+      console.log("aggre lenght", aggregates.length);
+      //total = aggregates.length;
 
-              // let total = Product.find({}).estimatedDocumentCount().exec();
-              console.log("totttttt", total);
+      const total = await Product.find(newobj).countDocuments();
 
-              res.json({ products, total });
-            });
-        }
-      });
+      const products = await Product.find(newobj) //same ctaeg wale
+        // .populate("category")
+        // .populate("subs")
+        .populate("category", "_id name")
+        .populate("subs", "_id name")
+        .populate("postedBy", "_id name")
+        //.sort([[sort, order]]) //sort by created, order is descending
+        .sort({ [sort]: order, _id: 1 }) //sort by created, order is descending
+        .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
+        .limit(perPage);
+      // .exec((err, products) => {
+      //   if (err) console.log("PRODUCT AGGREGATE ERROR", err);
+      //   // res.json(products);
+      //   console.log("totttttt", total);
+      //   res.json({ products, total });
+      // });
+      console.log("totttttt", total);
+      res.json({ products, total });
+    } else {
+      console.log("I am here non star condition", mylist);
+
+      const products = await Product.find(mylist) //same ctaeg wale
+        .populate("category")
+        .populate("subs")
+        // .populate("category", "_id name")
+        // .populate("subs", "_id name")
+        // .populate("postedBy", "_id name")
+        //.sort([[sort, order]]) //sort by created, order is descending
+        .sort({ [sort]: order, _id: 1 }) //sort by created, order is descending
+        .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
+        .limit(perPage);
+      // .exec((err, products) => {
+      //   if (err) console.log("PRODUCT AGGREGATE ERROR", err);
+
+      //   // let total = Product.find({}).estimatedDocumentCount().exec();
+      //   console.log("totttttt", total);
+
+      //   res.json({ products, total });
+      // });
+
+      console.log("totttttt", total);
+
+      res.json({ products, total });
+    }
+
+    // );
   } catch (err) {
     console.log(err);
   }

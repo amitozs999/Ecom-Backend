@@ -254,6 +254,15 @@ exports.saveAddress = async (req, res) => {
   res.json({ ok: true });
 };
 
+exports.getAddress = async (req, res) => {
+  console.log("user fetched for address here");
+  const user = await User.find({ email: req.user.email }).exec();
+
+  console.log("user fetched for address", user);
+  console.log("user fetched for address", user._id);
+  res.json({ addr: user });
+};
+
 exports.applyCouponToUserCart = async (req, res) => {
   const { coupon } = req.body;
   console.log("COUPON", coupon);

@@ -12,6 +12,7 @@ const {
   getUserCart,
   emptyCart,
   saveAddress,
+  getAddress,
   applyCouponToUserCart,
   createOrder,
   orders,
@@ -32,6 +33,8 @@ router.delete("/user/cart", authCheck, emptyCart); // empty cart
 router.post("/user/cart/coupon", authCheck, applyCouponToUserCart);
 
 router.post("/user/address", authCheck, saveAddress);
+
+router.get("/user/address", authCheck, getAddress);
 
 router.post("/user/order", authCheck, createOrder);
 router.get("/user/orders", authCheck, orders); //GET

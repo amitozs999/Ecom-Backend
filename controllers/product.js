@@ -123,7 +123,38 @@ exports.list = async (req, res) => {
     console.log(err);
   }
 };
+exports.listsortall = async (req, res) => {
+  // console.table(req.body);
 
+  //req.params.slug   passed in slug
+
+  console.log("viewall hit, ", req.body);
+  try {
+    // createdAt/updatedAt, desc/asc, 3(konse page ke prod fetch)  passed in
+    const { sort, order } = req.body; //passed in body
+    //const currentPage = page || 1; //by default page 1
+    //const perPage = 8; // 3
+    // const x1 = sortt;
+
+    console.log(sort);
+    console.log(order);
+    //console.log(page);
+
+    const products = await Product.find({})
+
+      .populate("category")
+      .populate("subs")
+      //.sort([[sort, order]]) //sort by created, order is descending
+      .sort({ [sort]: order, _id: 1 }) //sort by created, order is descending
+      // .skip((currentPage - 1) * perPage) //will skip this no of products for 1 to prev page wale ke
+      //.limit(perPage)
+      .exec();
+
+    res.json(products);
+  } catch (err) {
+    console.log(err);
+  }
+};
 exports.listsort = async (req, res) => {
   // console.table(req.body);
   try {

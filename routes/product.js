@@ -7,7 +7,12 @@ const { authCheck, adminCheck } = require("../middlewares/auth");
 // controller
 const { create, read } = require("../controllers/product");
 
-const { listAll, remove, update } = require("../controllers/product");
+const {
+  listAll,
+  remove,
+  update,
+  listsortall,
+} = require("../controllers/product");
 
 const { list } = require("../controllers/product");
 
@@ -31,6 +36,8 @@ router.get("/products/total", productsCount);
 
 //router.get("/products", read);   using below now
 router.get("/products/:count", listAll); // products/100
+
+router.post("/products/viewall", listsortall); // products/100 /products/viewall/:slug
 
 router.get("/product/:slug", read);
 
